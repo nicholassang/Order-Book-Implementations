@@ -33,8 +33,8 @@ void OrderBook::matchBuy(Order incoming) {
            !asks.empty() &&
            asks.begin()->first <= incoming.price) {
 
-        auto& level = asks.begin()->second;
-        auto it = level.begin();
+        auto& ordersAtPrice = asks.begin()->second;
+        auto it = ordersAtPrice.begin();
 
         uint32_t traded =
             std::min(incoming.quantity, it->quantity);
@@ -44,19 +44,19 @@ void OrderBook::matchBuy(Order incoming) {
 
         if (it->quantity == 0) {
             orderIndex.erase(it->id);
-            level.erase(it);
+            ordersAtPrice.erase(it);
         }
 
-        if (level.empty()) {
+        if (ordersAtPrice.empty()) {
             asks.erase(asks.begin());
         }
     }
 
     if (incoming.quantity > 0) {
-        auto& level = bids[incoming.price];
-        level.push_back(incoming);
+        auto& ordersAtPrice = bids[incoming.price];
+        ordersAtPrice.push_back(incoming);
 
-        auto it = std::prev(level.end());
+        auto it = std::prev(ordersAtPrice.end());
 
         orderIndex[incoming.id] =
             {Side::BUY, incoming.price, it};
@@ -69,8 +69,8 @@ void OrderBook::matchSell(Order incoming) {
            !bids.empty() &&
            bids.begin()->first >= incoming.price) {
 
-        auto& level = bids.begin()->second;
-        auto it = level.begin();
+        auto& ordersAtPrice = bids.begin()->second;
+        auto it = ordersAtPrice.begin();
 
         uint32_t traded =
             std::min(incoming.quantity, it->quantity);
@@ -80,19 +80,19 @@ void OrderBook::matchSell(Order incoming) {
 
         if (it->quantity == 0) {
             orderIndex.erase(it->id);
-            level.erase(it);
+            ordersAtPrice.erase(it);
         }
 
-        if (level.empty()) {
+        if (ordersAtPrice.empty()) {
             bids.erase(bids.begin());
         }
     }
 
     if (incoming.quantity > 0) {
-        auto& level = asks[incoming.price];
-        level.push_back(incoming);
+        auto& ordersAtPrice = asks[incoming.price];
+        ordersAtPrice.push_back(incoming);
 
-        auto it = std::prev(level.end());
+        auto it = std::prev(ordersAtPrice.end());
 
         orderIndex[incoming.id] =
             {Side::SELL, incoming.price, it};

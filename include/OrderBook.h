@@ -9,10 +9,6 @@
 #include <vector>
 
 class OrderBook {
-public:
-    void addOrder(const Order& order);
-    bool cancelOrder(uint64_t orderId);
-
 private:
     struct OrderLocation {
         Side side;
@@ -27,4 +23,10 @@ private:
 
     void matchBuy(Order incoming);
     void matchSell(Order incoming);
+    
+public:
+    void addOrder(const Order& order);
+    bool cancelOrder(uint64_t orderId);
+    const auto& getBids() const { return bids; }
+    const auto& getAsks() const { return asks; }
 };
