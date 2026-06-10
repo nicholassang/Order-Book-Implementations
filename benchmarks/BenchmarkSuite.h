@@ -78,7 +78,7 @@ inline double BenchmarkSuite<OrderBookType>::getMemoryUsageMB() {
 
 template <typename OrderBookType>
 inline void BenchmarkSuite<OrderBookType>::printResult(const BenchmarkResult& result) {
-    printf("%-20s %-25s | %8d orders | %10.2f ms | %8.2f us/order | Bids: %6zu | Asks: %6zu\n",
+    printf("%-15s %-15s | %8d orders | %10.2f ms | %8.2f us/order | Bids: %6zu | Asks: %6zu\n",
            result.implementationName.c_str(),
            result.marketCondition.c_str(),
            result.numOrders,
@@ -91,10 +91,10 @@ inline void BenchmarkSuite<OrderBookType>::printResult(const BenchmarkResult& re
 template <typename OrderBookType>
 inline void BenchmarkSuite<OrderBookType>::printComparison(const std::vector<BenchmarkResult>& results) {
     printf("\n");
-    printf("%-20s %-25s | %8s | %10s | %15s | %6s | %6s\n",
+    printf("%-15s %-15s | %8s | %10s | %15s | %6s | %6s\n",
            "Implementation", "Market", "Orders", "Time (ms)", "us/Order", "Bids", "Asks");
-    printf("%-20s %-25s | %8s | %10s | %15s | %6s | %6s\n",
-           "--------------------", "-------------------------", "--------", "----------", "---------------", "------", "------");
+    printf("%-15s %-15s | %8s | %10s | %15s | %6s | %6s\n",
+           "---------------", "----------", "--------", "----------", "---------------", "------", "------");
     
     for (const auto& result : results) {
         printResult(result);

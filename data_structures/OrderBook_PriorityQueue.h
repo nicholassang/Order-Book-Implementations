@@ -6,6 +6,8 @@
 #include <queue>
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
+#include <limits>
 
 // Priority queue-based implementation (optimized for fast best price access)
 class OrderBook_PriorityQueue {
