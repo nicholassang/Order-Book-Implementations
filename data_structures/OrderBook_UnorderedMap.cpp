@@ -1,5 +1,11 @@
 #include "OrderBook_UnorderedMap.h"
 #include <cmath>
+#include <limits>
+
+// Helper: Convert double price to uint64_t key (price * 100)
+static inline uint64_t priceToKey(double price) {
+    return static_cast<uint64_t>(std::round(price * 100));
+}
 
 void OrderBook_UnorderedMap::addOrder(const Order& order) {
     if (order.side == Side::BUY) {
@@ -15,12 +21,26 @@ bool OrderBook_UnorderedMap::cancelOrder(uint64_t orderId) {
         return false;
     }
 
-    uint64_t price = priceIt->second;
+    uint64_t priceKey = priceIt->second;
     Side side = orderSideMap[orderId];
-    size_t index = orderIndexMap[orderId];
 
-    auto& level = (side == Side::BUY) ? bidLevels[price] : askLevels[price];
-    level.orders.erase(level.orders.begin() + index);
+    auto& levels = (side == Side::BUY) ? bidLevels : askLevels;
+    auto levelIt = levels.find(priceKey);
+    
+    if (levelIt == levels.end()) {
+        return false;
+    }
+
+    auto& orders = levelIt->second.orders;
+    auto orderIt = std::find_if(orders.begin(), orders.end(),
+                                [orderId](const Order& o) { return o.id == orderId; });
+    
+    if (orderIt != orders.end()) {
+        orders.erase(orderIt);
+        if (orders.empty()) {
+            levels.erase(levelIt);
+        }
+    }
 
     orderPriceMap.erase(priceIt);
     orderIndexMap.erase(orderId);
@@ -30,12 +50,15 @@ bool OrderBook_UnorderedMap::cancelOrder(uint64_t orderId) {
 }
 
 void OrderBook_UnorderedMap::matchBuy(Order incoming) {
+    uint64_t incomingPriceKey = priceToKey(incoming.price);
+    
     // Find best asks and match
     while (incoming.quantity > 0 && !askLevels.empty()) {
-        uint64_t bestAskPrice = 0;
+        uint64_t bestAskPrice = std::numeric_limits<uint64_t>::max();
         findBestAsk(bestAskPrice);
 
-        if (askLevels.find(bestAskPrice) == askLevels.end() || bestAskPrice > static_cast<uint64_t>(incoming.price)) {
+        // Check if best ask price is not found or exceeds incoming bid price
+        if (bestAskPrice == std::numeric_limits<uint64_t>::max() || bestAskPrice > incomingPriceKey) {
             break;
         }
 
@@ -58,22 +81,25 @@ void OrderBook_UnorderedMap::matchBuy(Order incoming) {
         }
     }
 
+    // Add remaining quantity to bid book
     if (incoming.quantity > 0) {
-        uint64_t priceKey = static_cast<uint64_t>(incoming.price * 100);
-        bidLevels[priceKey].orders.push_back(incoming);
-        orderPriceMap[incoming.id] = priceKey;
-        orderIndexMap[incoming.id] = bidLevels[priceKey].orders.size() - 1;
+        bidLevels[incomingPriceKey].orders.push_back(incoming);
+        orderPriceMap[incoming.id] = incomingPriceKey;
+        orderIndexMap[incoming.id] = bidLevels[incomingPriceKey].orders.size() - 1;
         orderSideMap[incoming.id] = Side::BUY;
     }
 }
 
 void OrderBook_UnorderedMap::matchSell(Order incoming) {
+    uint64_t incomingPriceKey = priceToKey(incoming.price);
+    
     // Find best bids and match
     while (incoming.quantity > 0 && !bidLevels.empty()) {
         uint64_t bestBidPrice = 0;
         findBestBid(bestBidPrice);
 
-        if (bidLevels.find(bestBidPrice) == bidLevels.end() || bestBidPrice < static_cast<uint64_t>(incoming.price)) {
+        // Check if best bid price is not found or is less than incoming ask price
+        if (bestBidPrice == 0 || bestBidPrice < incomingPriceKey) {
             break;
         }
 
@@ -96,11 +122,11 @@ void OrderBook_UnorderedMap::matchSell(Order incoming) {
         }
     }
 
+    // Add remaining quantity to ask book
     if (incoming.quantity > 0) {
-        uint64_t priceKey = static_cast<uint64_t>(incoming.price * 100);
-        askLevels[priceKey].orders.push_back(incoming);
-        orderPriceMap[incoming.id] = priceKey;
-        orderIndexMap[incoming.id] = askLevels[priceKey].orders.size() - 1;
+        askLevels[incomingPriceKey].orders.push_back(incoming);
+        orderPriceMap[incoming.id] = incomingPriceKey;
+        orderIndexMap[incoming.id] = askLevels[incomingPriceKey].orders.size() - 1;
         orderSideMap[incoming.id] = Side::SELL;
     }
 }
@@ -108,16 +134,16 @@ void OrderBook_UnorderedMap::matchSell(Order incoming) {
 void OrderBook_UnorderedMap::findBestBid(uint64_t& price) const {
     price = 0;
     for (const auto& [p, level] : bidLevels) {
-        if (p > price) {
+        if (!level.orders.empty() && p > price) {
             price = p;
         }
     }
 }
 
 void OrderBook_UnorderedMap::findBestAsk(uint64_t& price) const {
-    price = UINT64_MAX;
+    price = std::numeric_limits<uint64_t>::max();
     for (const auto& [p, level] : askLevels) {
-        if (p < price) {
+        if (!level.orders.empty() && p < price) {
             price = p;
         }
     }

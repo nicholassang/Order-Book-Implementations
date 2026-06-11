@@ -59,3 +59,10 @@ ctest
 2. **PriorityQueue**: ~0.9M orders/sec
 3. **UnorderedMap**: ~0.8M orders/sec
 4. **Vector**: ~0.6M orders/sec
+
+
+Implementation	Avg Speed	Issue
+Map-based	0.82 μs	✅ Fastest (binary search)
+UnorderedMap	7.66 μs	O(n) linear search each order
+Vector	14.19 μs	O(n) insertion cost
+PriorityQueue	17.33 μs	Lazy deletion overhead

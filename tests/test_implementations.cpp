@@ -43,7 +43,7 @@ void testOrderBook(const std::string& implName) {
     std::cout << "  Bid count after cancel: " << bidCount << std::endl;
     assert(bidCount == 1 && "Bid count should be 1 after cancel");
     
-    std::cout << "  ✓ PASSED" << std::endl << std::endl;
+    std::cout << "  Status: PASSED" << std::endl << std::endl;
 }
 
 // Test matching logic
@@ -69,7 +69,7 @@ void testMatching(const std::string& implName) {
     assert(bidCount == 1 && "Should have 1 bid after partial match");
     assert(askCount == 0 && "Should have 0 asks after full match");
     
-    std::cout << "  ✓ PASSED" << std::endl << std::endl;
+    std::cout << "  Status: PASSED" << std::endl << std::endl;
 }
 
 int main() {

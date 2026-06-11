@@ -9,6 +9,7 @@ class MarketDataGenerator {
 private:
     std::mt19937 rng;
     uint64_t nextOrderId = 1;
+    Order generateSingleOrder(double price);
     
 public:
     MarketDataGenerator(uint32_t seed = 42);
@@ -23,7 +24,4 @@ public:
     // Save and load
     void saveOrdersToCSV(const std::vector<Order>& orders, const std::string& filename);
     std::vector<Order> loadOrdersFromCSV(const std::string& filename);
-    
-private:
-    Order generateSingleOrder(double price);
 };
