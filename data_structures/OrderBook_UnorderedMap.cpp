@@ -43,7 +43,6 @@ bool OrderBook_UnorderedMap::cancelOrder(uint64_t orderId) {
     }
 
     orderPriceMap.erase(priceIt);
-    orderIndexMap.erase(orderId);
     orderSideMap.erase(orderId);
 
     return true;
@@ -71,7 +70,6 @@ void OrderBook_UnorderedMap::matchBuy(Order incoming) {
 
         if (it->quantity == 0) {
             orderPriceMap.erase(it->id);
-            orderIndexMap.erase(it->id);
             orderSideMap.erase(it->id);
             ordersAtPrice.erase(it);
         }
@@ -85,7 +83,6 @@ void OrderBook_UnorderedMap::matchBuy(Order incoming) {
     if (incoming.quantity > 0) {
         bidLevels[incomingPriceKey].orders.push_back(incoming);
         orderPriceMap[incoming.id] = incomingPriceKey;
-        orderIndexMap[incoming.id] = bidLevels[incomingPriceKey].orders.size() - 1;
         orderSideMap[incoming.id] = Side::BUY;
     }
 }
@@ -112,7 +109,6 @@ void OrderBook_UnorderedMap::matchSell(Order incoming) {
 
         if (it->quantity == 0) {
             orderPriceMap.erase(it->id);
-            orderIndexMap.erase(it->id);
             orderSideMap.erase(it->id);
             ordersAtPrice.erase(it);
         }
@@ -126,7 +122,6 @@ void OrderBook_UnorderedMap::matchSell(Order incoming) {
     if (incoming.quantity > 0) {
         askLevels[incomingPriceKey].orders.push_back(incoming);
         orderPriceMap[incoming.id] = incomingPriceKey;
-        orderIndexMap[incoming.id] = askLevels[incomingPriceKey].orders.size() - 1;
         orderSideMap[incoming.id] = Side::SELL;
     }
 }

@@ -15,7 +15,6 @@ private:
     };
 
     std::unordered_map<uint64_t, uint64_t> orderPriceMap;  // orderId -> price
-    std::unordered_map<uint64_t, size_t> orderIndexMap;     // orderId -> index in price level
     std::unordered_map<uint64_t, Side> orderSideMap;        // orderId -> side
     
     std::unordered_map<uint64_t, PriceLevel> bidLevels;
