@@ -91,7 +91,7 @@ inline void BenchmarkSuite<OrderBookType>::printResult(const BenchmarkResult& re
 template <typename OrderBookType>
 inline void BenchmarkSuite<OrderBookType>::printComparison(const std::vector<BenchmarkResult>& results) {
     printf("\n");
-    printf("%-15s %-15s | %15s | %13s | %17s | %12s | %10s\n",
+    printf("%-15s %-15s | %-15s | %-13s | %-17s | %-12s | %-10s\n",
            "Implementation", "Market", "Orders", "Time (ms)", "us/Order", "Bids", "Asks");
     printf("%-15s %-15s | %8s | %10s | %15s | %6s | %6s\n",
            "---------------", "---------------", "---------------", "-------------", "-----------------", "------------", "-----------");
