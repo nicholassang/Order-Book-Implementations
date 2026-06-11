@@ -94,7 +94,7 @@ inline void BenchmarkSuite<OrderBookType>::printComparison(const std::vector<Ben
     printf("%-15s %-15s | %15s | %13s | %17s | %12s | %10s\n",
            "Implementation", "Market", "Orders", "Time (ms)", "us/Order", "Bids", "Asks");
     printf("%-15s %-15s | %8s | %10s | %15s | %6s | %6s\n",
-           "---------------", "----------", "---------------", "-------------", "-----------------", "------------", "-----------");
+           "---------------", "---------------", "---------------", "-------------", "-----------------", "------------", "-----------");
     
     for (const auto& result : results) {
         printResult(result);
