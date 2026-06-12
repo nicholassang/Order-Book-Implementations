@@ -4,6 +4,24 @@ project(OrderBook)
 
 set(CMAKE_CXX_STANDARD 20)
 
+# Get Google Benchmark
+include(FetchContent)
+
+
+set(BENCHMARK_ENABLE_TESTING OFF)
+set(BENCHMARK_ENABLE_GTEST_TESTS OFF)
+set(BENCHMARK_USE_BUNDLED_GTEST OFF)
+
+FetchContent_Declare(
+    benchmark
+    GIT_REPOSITORY https://github.com/google/benchmark.git
+    GIT_TAG v1.9.4
+)
+
+set(BENCHMARK_ENABLE_TESTING OFF)
+
+FetchContent_MakeAvailable(benchmark)
+
 # Core library with map-based implementation
 add_library(orderbook
     src/OrderBook.cpp
@@ -19,7 +37,6 @@ target_include_directories(
     PUBLIC include
     PUBLIC data_structures
     PUBLIC data
-    PUBLIC benchmarks
 )
 
 # Main demo executable
@@ -36,8 +53,12 @@ add_executable(orderbook_benchmark
     benchmarks/BenchmarkRunner.cpp
 )
 
+# Benchmark
 target_link_libraries(orderbook_benchmark
-    PRIVATE orderbook
+    PRIVATE
+        orderbook
+        benchmark::benchmark
+        benchmark::benchmark_main
 )
 
 # Test executable
